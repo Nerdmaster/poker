@@ -26,9 +26,9 @@ seven-card hands per second, and nearly a billion five-card hands per second:
 
 ```
 pkg: github.com/Nerdmaster/poker
-BenchmarkEvalFiveFast-16        837644409                6.70 ns/op
-BenchmarkEvaluateFive-16        703266120                8.47 ns/op
-BenchmarkEvaluateSeven-16       30624259               194 ns/op
+BenchmarkEvalFiveFast-16        165811814                7.08 ns/op            0 B/op          0 allocs/op
+BenchmarkEvaluateFive-16        134446173                8.73 ns/op            0 B/op          0 allocs/op
+BenchmarkEvaluateSeven-16        5980243               195 ns/op               0 B/op          0 allocs/op
 ```
 
 This isn't directly comparable to chehsunliu/poker, because each benchmark loop
@@ -38,20 +38,22 @@ benchmark suite:
 
 ```
 pkg: github.com/chehsunliu/poker
-BenchmarkFiveNerdmaster-16      177566901               67.3 ns/op
-BenchmarkFivePoker-16           70615275               168 ns/op
-BenchmarkFiveJoker-16             359961             31131 ns/op
-BenchmarkSixNerdmaster-16       23403450               507 ns/op
-BenchmarkSixPoker-16             8662846              1376 ns/op
-BenchmarkSixJoker-16               76149            157771 ns/op
-BenchmarkSevenNerdmaster-16      7137416              1690 ns/op
-BenchmarkSevenPoker-16           1000000             10886 ns/op
-BenchmarkSevenJoker-16             21188            566397 ns/op
+BenchmarkFiveNerdmaster-16      173458536               68.7 ns/op             0 B/op          0 allocs/op
+BenchmarkFivePoker-16           69460522               172 ns/op               0 B/op          0 allocs/op
+BenchmarkFiveJoker-16             375366             32068 ns/op           14433 B/op        657 allocs/op
+BenchmarkSixNerdmaster-16       22927119               520 ns/op               0 B/op          0 allocs/op
+BenchmarkSixPoker-16             8416456              1419 ns/op             288 B/op          9 allocs/op
+BenchmarkSixJoker-16               74277            161396 ns/op           67972 B/op       2923 allocs/op
+BenchmarkSevenNerdmaster-16      6978400              1715 ns/op               0 B/op          0 allocs/op
+BenchmarkSevenPoker-16           1000000             11050 ns/op            2304 B/op         72 allocs/op
+BenchmarkSevenJoker-16             20720            579313 ns/op          265405 B/op      10231 allocs/op
 ```
 
-My implementation absolutely crushes those other two, with the worst-case being
-an improvement of nearly 3x for five- and six-card hands, while seven-card
-evaluations are over 7x faster.
+My implementation absolutely crushes those other two:
+
+- No memory is allocated on the heap in any cases
+- Worst-case improvement is in the five-card case, at 2.5x faster
+- The seven-card case is over 7x faster
 
 I can't take much credit for this, though - most of the performance comes from
 porting C, C#, and even Java implementations I found all over the net which I
