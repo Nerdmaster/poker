@@ -32,10 +32,6 @@ func TestRankString(t *testing.T) {
 	}
 }
 
-var data2 = map[int32]string{}
-
-var data3 = map[int32]string{}
-
 func TestEvaluate(t *testing.T) {
 	var tests = map[string]struct {
 		handValue uint16
