@@ -8,4 +8,4 @@ test:
 	go tool cover -html coverage.txt -o coverage.html
 
 benchmark:
-	go test -bench=. -benchtime 10s
+	go test -bench=. -benchmem -benchtime 10s
