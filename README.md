@@ -21,8 +21,8 @@ random hand and outputs its rank and description.
 
 ## Performance
 
-On my local system, which is pretty fast, this suite can do about 30 million
-seven-card hands per second, and nearly a billion five-card hands per second:
+On my local system, which is pretty fast, this suite can do about 5 million
+seven-card hands per second, and over 100 million five-card hands per second:
 
 ```
 pkg: github.com/Nerdmaster/poker
