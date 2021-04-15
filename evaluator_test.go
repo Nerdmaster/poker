@@ -2,6 +2,7 @@ package poker
 
 import (
 	"encoding/json"
+	"strings"
 	"testing"
 )
 
@@ -92,6 +93,85 @@ func TestEvaluate(t *testing.T) {
 	}
 }
 
+var omahaTests = map[string]struct {
+	handValue uint16
+	hole      string
+	community string
+	handRank  HandRank
+	bestHole  string
+	bestComm  string
+}{
+	// Various ways of getting just a high card
+	"high 1": {6251, "8c 3d As Ks", "Jc 7h 5d 2d 6s", HighCard, "As Ks", "Jc 7h 6s"},
+	"high 2": {6251, "Qc 3d As Ks", "Jc 7h 5d 2d 6s", HighCard, "As Ks", "Jc 7h 6s"},
+	"high 3": {6699, "Qc 3d Ks Ts", "Jc 7h 5d 2d 6s", HighCard, "Qc Ks", "Jc 7h 6s"},
+	"Flush":  {722, "Js 8h Th 7d", "8c 3h Ah 5h 8s", Flush, "8h Th", "3h Ah 5h"},
+	// No flush: you have to use two cards from your hand
+	"No flush": {6699, "Qc 3d Ks Ts", "Jc 7c 5c 2c 6c", HighCard, "Qc Ks", "Jc 7c 6c"},
+	// Lowest straight because you can't use three hole cards
+	"Low str8": {1609, "Ac Qd Js 4h", "5c Kd Th 2s 3h", Straight, "Ac 4h", "5c 2s 3h"},
+	// This gets the highest straight even though the combined cards are the same
+	"High str8": {1600, "Ac Qd 3h 4h", "5c Kd Th 2s Js", Straight, "Ac Qd", "Kd Th Js"},
+
+	// And now a few random hands just for extra assurance
+	"Two pair":   {2853, "2c Jd 8h 4h", "Jc 8d 3h Qs Ad", TwoPair, "Jd 8h", "Jc 8d Ad"},
+	"One pair":   {5093, "7h As Jc 6d", "6s Kd 2s 4s 3d", OnePair, "As 6d", "6s Kd 4s"},
+	"Full House": {288, "Kc 2s 4c Qd", "3h 7c 4d 4s Kd", FullHouse, "Kc 4c", "4d 4s Kd"},
+}
+
+func TestEvaluateOmaha(t *testing.T) {
+	for name, tc := range omahaTests {
+		t.Run(name, func(t *testing.T) {
+			var hole, community []Card
+			for _, c := range strings.Fields(tc.hole) {
+				hole = append(hole, newCardString(c))
+			}
+			for _, c := range strings.Fields(tc.community) {
+				community = append(community, newCardString(c))
+			}
+
+			var handVal = EvaluateOmaha(hole, community)
+			var handRank = GetHandRank(handVal)
+			if handRank != tc.handRank {
+				t.Fatalf("%s,%s gave a hand rank of %q; expected %q", hole, community, handRank, tc.handRank)
+			}
+			if handVal != tc.handValue {
+				t.Fatalf("%s,%s gave a hand value of %d; expected %d", hole, community, handVal, tc.handValue)
+			}
+		})
+	}
+}
+
+func TestBestOmahaHand(t *testing.T) {
+	var stringify = func(cards []Card) string {
+		var list = make([]string, len(cards))
+		for i, c := range cards {
+			list[i] = c.String()
+		}
+
+		return strings.Join(list, " ")
+	}
+
+	for name, tc := range omahaTests {
+		t.Run(name, func(t *testing.T) {
+			var hole, community []Card
+			for _, c := range strings.Fields(tc.hole) {
+				hole = append(hole, newCardString(c))
+			}
+			for _, c := range strings.Fields(tc.community) {
+				community = append(community, newCardString(c))
+			}
+
+			var _, bestH, bestC = BestOmahaHand(hole, community)
+			var gotHole = stringify(bestH[:])
+			var gotComm = stringify(bestC[:])
+			if gotHole != tc.bestHole || gotComm != tc.bestComm {
+				t.Fatalf("%s,%s: expected %s,%s to be best, but got %s,%s", hole, community, tc.bestHole, tc.bestComm, gotHole, gotComm)
+			}
+		})
+	}
+}
+
 func BenchmarkEvalFiveFast(b *testing.B) {
 	var deck *Deck
 	var hands = make([][]Card, 100)
@@ -137,5 +217,37 @@ func BenchmarkEvaluateSeven(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		var hand = hands[i%hl]
 		Evaluate(hand)
+	}
+}
+
+func BenchmarkEvaluateOmaha(b *testing.B) {
+	var deck *Deck
+	var hands = make([][]Card, 100)
+	for i := 0; i < 100; i++ {
+		deck = NewDeck()
+		deck.Shuffle()
+		hands[i] = deck.Draw(9)
+	}
+
+	var hl = len(hands)
+	for i := 0; i < b.N; i++ {
+		var hand = hands[i%hl]
+		EvaluateOmaha(hand[:4], hand[4:])
+	}
+}
+
+func BenchmarkBestOmahaHand(b *testing.B) {
+	var deck *Deck
+	var hands = make([][]Card, 100)
+	for i := 0; i < 100; i++ {
+		deck = NewDeck()
+		deck.Shuffle()
+		hands[i] = deck.Draw(9)
+	}
+
+	var hl = len(hands)
+	for i := 0; i < b.N; i++ {
+		var hand = hands[i%hl]
+		BestOmahaHand(hand[:4], hand[4:])
 	}
 }
