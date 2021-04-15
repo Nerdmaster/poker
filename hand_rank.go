@@ -1,7 +1,9 @@
 package poker
 
+// HandRank represents the nine possible ranks of hands
 type HandRank int
 
+// The nine possible HandRanks in Poker
 const (
 	StraightFlush HandRank = iota + 1
 	FourOfAKind
@@ -14,6 +16,8 @@ const (
 	HighCard
 )
 
+// GetHandRank converts a hand value (from the evalFiveFast algorithm) into the
+// rank it represents
 func GetHandRank(v uint16) HandRank {
 	if v > 6185 {
 		return HighCard

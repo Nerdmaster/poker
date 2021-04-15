@@ -29,6 +29,8 @@ func findFast(prod uint32) uint32 {
 	return r
 }
 
+// Evaluate returns the score for the best five-card poker hand found.  Hands
+// can be 5, 6, or 7 cards, otherwise the return will be math.MaxUint16.
 func Evaluate(c []Card) uint16 {
 	if len(c) == 5 {
 		return evalFiveFast(c[0], c[1], c[2], c[3], c[4])
