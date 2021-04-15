@@ -117,3 +117,28 @@ func TestBitRank(t *testing.T) {
 		t.Fatalf("%q bitrank: got %d, expected 2048", c, br)
 	}
 }
+
+func BenchmarkNewCard(b *testing.B) {
+	var ranks = [13]CardRank{Deuce, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Jack, Queen, King, Ace}
+	var suits = [4]CardSuit{Clubs, Diamonds, Spades, Hearts}
+	for i := 0; i < b.N; i++ {
+		NewCard(ranks[i%13], suits[i%4])
+	}
+}
+
+func BenchmarkNewCardString(b *testing.B) {
+	var ranks = [13]string{"2", "3", "4", "5", "6", "7", "8", "9", "T", "J", "Q", "K", "A"}
+	var suits = [4]string{"c", "h", "d", "s"}
+	var strings [52]string
+	var idx int
+	for _, rank := range ranks {
+		for _, suit := range suits {
+			strings[idx] = rank + suit
+			idx++
+		}
+	}
+
+	for i := 0; i < b.N; i++ {
+		NewCardString(strings[i%52])
+	}
+}
