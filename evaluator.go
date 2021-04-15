@@ -42,6 +42,47 @@ func Evaluate(c []Card) uint16 {
 	return evalMore(c)
 }
 
+// BestHand returns the score as well as the best five-card hand found
+func BestHand(cards []Card) (score uint16, best [5]Card) {
+	score = math.MaxUint16
+	if len(cards) < 5 || len(cards) > 7 {
+		return
+	}
+	if len(cards) == 5 {
+		best[0] = cards[0]
+		best[1] = cards[1]
+		best[2] = cards[2]
+		best[3] = cards[3]
+		best[4] = cards[4]
+		return evalFiveFast(cards[0], cards[1], cards[2], cards[3], cards[4]), best
+	}
+
+	var perms = perms7
+	if len(cards) == 6 {
+		perms = perms6
+	}
+
+	for _, perm := range perms {
+		var val = evalFiveFast(
+			cards[perm[0]],
+			cards[perm[1]],
+			cards[perm[2]],
+			cards[perm[3]],
+			cards[perm[4]],
+		)
+		if val < score {
+			score = val
+			best[0] = cards[perm[0]]
+			best[1] = cards[perm[1]]
+			best[2] = cards[perm[2]]
+			best[3] = cards[perm[3]]
+			best[4] = cards[perm[4]]
+		}
+	}
+
+	return
+}
+
 var perms6 = [][5]int{
 	{0, 1, 2, 3, 4},
 	{0, 1, 2, 3, 5},

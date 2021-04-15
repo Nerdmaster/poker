@@ -6,6 +6,15 @@ import (
 	"testing"
 )
 
+func stringifyCards(cards []Card) string {
+	var list = make([]string, len(cards))
+	for i, c := range cards {
+		list[i] = c.String()
+	}
+
+	return strings.Join(list, " ")
+}
+
 func TestRankString(t *testing.T) {
 	var tests = map[string]struct {
 		handValue uint16
@@ -93,6 +102,42 @@ func TestEvaluate(t *testing.T) {
 	}
 }
 
+func TestBestHand(t *testing.T) {
+	var tests = map[string]struct {
+		input string
+		want  string
+	}{
+		// Five-card hands
+		"Five card returns the same hand": {"As Ks Jc 7h 5d", "As Ks Jc 7h 5d"},
+
+		// Seven-card hands
+		"Seven-card ace high":        {"2d 3d As Ks Jc 7h 5d", "As Ks Jc 7h 5d"},
+		"Seven-card pair":            {"2d 3d As Ac Jc 7h 5d", "As Ac Jc 7h 5d"},
+		"Seven-card two pair":        {"2d 3d As Ac Jc Jd 5d", "As Ac Jc Jd 5d"},
+		"Seven-card three of a kind": {"2c 3d 3h 3c Ad Jd 5d", "3d 3h 3c Ad Jd"},
+		"Seven-card straight":        {"Jh 2d 3d Ks As Qd Td", "Jh Ks As Qd Td"},
+		"Seven-card flush":           {"2s 3d Ts 7s 4s 3s 9s", "Ts 7s 4s 3s 9s"},
+		"Seven-card full house":      {"2d 3d 4s 4c 4d 3s 3h", "3d 4s 4c 4d 3s"},
+		"Seven-card four of a kind":  {"2d 3d 2s 2c Ad 2h 5h", "2d 2s 2c Ad 2h"},
+		"Seven-card straight flush":  {"2s 3d As Ks 4s 3s 5s", "2s As 4s 3s 5s"},
+	}
+
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			var hand []Card
+			for _, c := range strings.Fields(tc.input) {
+				hand = append(hand, newCardString(c))
+			}
+			var _, best = BestHand(hand)
+
+			var got = stringifyCards(best[:])
+			if got != tc.want {
+				t.Fatalf("%s gave a best hand of %s; expected %s", tc.input, got, tc.want)
+			}
+		})
+	}
+}
+
 var omahaTests = map[string]struct {
 	handValue uint16
 	hole      string
@@ -143,15 +188,6 @@ func TestEvaluateOmaha(t *testing.T) {
 }
 
 func TestBestOmahaHand(t *testing.T) {
-	var stringify = func(cards []Card) string {
-		var list = make([]string, len(cards))
-		for i, c := range cards {
-			list[i] = c.String()
-		}
-
-		return strings.Join(list, " ")
-	}
-
 	for name, tc := range omahaTests {
 		t.Run(name, func(t *testing.T) {
 			var hole, community []Card
@@ -163,8 +199,8 @@ func TestBestOmahaHand(t *testing.T) {
 			}
 
 			var _, bestH, bestC = BestOmahaHand(hole, community)
-			var gotHole = stringify(bestH[:])
-			var gotComm = stringify(bestC[:])
+			var gotHole = stringifyCards(bestH[:])
+			var gotComm = stringifyCards(bestC[:])
 			if gotHole != tc.bestHole || gotComm != tc.bestComm {
 				t.Fatalf("%s,%s: expected %s,%s to be best, but got %s,%s", hole, community, tc.bestHole, tc.bestComm, gotHole, gotComm)
 			}
@@ -217,6 +253,22 @@ func BenchmarkEvaluateSeven(b *testing.B) {
 	for i := 0; i < b.N; i++ {
 		var hand = hands[i%hl]
 		Evaluate(hand)
+	}
+}
+
+func BenchmarkBestHandSeven(b *testing.B) {
+	var deck *Deck
+	var hands = make([][]Card, 100)
+	for i := 0; i < 100; i++ {
+		deck = NewDeck()
+		deck.Shuffle()
+		hands[i] = deck.Draw(7)
+	}
+
+	var hl = len(hands)
+	for i := 0; i < b.N; i++ {
+		var hand = hands[i%hl]
+		BestHand(hand)
 	}
 }
 
