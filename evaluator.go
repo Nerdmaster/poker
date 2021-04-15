@@ -17,6 +17,18 @@ func evalFiveFast(c1, c2, c3, c4, c5 Card) uint16 {
 	return hashValues[findFast(uint32(product))]
 }
 
+func findFast(prod uint32) uint32 {
+	var a, b, r uint32
+	prod += 0xe91aaa35
+	prod ^= prod >> 16
+	prod += prod << 8
+	prod ^= prod >> 4
+	b = (prod >> 8) & 0x1ff
+	a = (prod + (prod << 2)) >> 19
+	r = a ^ uint32(hashAdjust[b])
+	return r
+}
+
 func Evaluate(c []Card) uint16 {
 	if len(c) == 5 {
 		return evalFiveFast(c[0], c[1], c[2], c[3], c[4])
@@ -83,16 +95,4 @@ func evalMore(cards []Card) uint16 {
 	}
 
 	return minimum
-}
-
-func findFast(prod uint32) uint32 {
-	var a, b, r uint32
-	prod += 0xe91aaa35
-	prod ^= prod >> 16
-	prod += prod << 8
-	prod ^= prod >> 4
-	b = (prod >> 8) & 0x1ff
-	a = (prod + (prod << 2)) >> 19
-	r = a ^ uint32(hashAdjust[b])
-	return r
 }
