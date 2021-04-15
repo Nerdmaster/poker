@@ -149,7 +149,3 @@ func (c Card) Rank() CardRank {
 func (c Card) Suit() CardSuit {
 	return CardSuit((uint32(c) >> 12) & 0xF)
 }
-
-func (c Card) BitRank() uint32 {
-	return (uint32(c) >> 16) & 0x1FFF
-}

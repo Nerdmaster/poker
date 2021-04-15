@@ -110,14 +110,6 @@ func TestString(t *testing.T) {
 	}
 }
 
-func TestBitRank(t *testing.T) {
-	var c = newCardString("Ks")
-	var br = c.BitRank()
-	if br != 2048 {
-		t.Fatalf("%q bitrank: got %d, expected 2048", c, br)
-	}
-}
-
 func BenchmarkNewCard(b *testing.B) {
 	var ranks = [13]CardRank{Deuce, Three, Four, Five, Six, Seven, Eight, Nine, Ten, Jack, Queen, King, Ace}
 	var suits = [4]CardSuit{Clubs, Diamonds, Spades, Hearts}
