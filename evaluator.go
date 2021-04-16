@@ -29,8 +29,11 @@ func findFast(prod uint32) uint32 {
 	return r
 }
 
-// Evaluate returns the score for the best five-card poker hand found.  Hands
-// can be 5, 6, or 7 cards, otherwise the return will be math.MaxUint16.
+// Evaluate returns the score for the best five-card poker hand found.  The
+// lower the score, the better the hand, with a royal flush being 1, and the
+// worst-possible high card (2, 3, 4, 5, 7) being 7462.
+//
+// Hands can be 5, 6, or 7 cards, otherwise the return will be math.MaxUint16.
 func Evaluate(c []Card) uint16 {
 	if len(c) == 5 {
 		return evalFiveFast(c[0], c[1], c[2], c[3], c[4])
@@ -42,7 +45,10 @@ func Evaluate(c []Card) uint16 {
 	return evalMore(c)
 }
 
-// BestHand returns the score as well as the best five-card hand found
+// BestHand returns the same score as Evaluate, but also the full set of five
+// cards that made up the best hand.  In cases where you only have five card,
+// this is useless, but it can be more helpful when trying to see *why* a given
+// seven-card hand won, especially for Poker novices.
 func BestHand(cards []Card) (score uint16, best [5]Card) {
 	score = math.MaxUint16
 	if len(cards) < 5 || len(cards) > 7 {
