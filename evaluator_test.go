@@ -2,8 +2,10 @@ package poker
 
 import (
 	"encoding/json"
+	"math/rand"
 	"strings"
 	"testing"
+	"time"
 )
 
 func stringifyCards(cards []Card) string {
@@ -212,7 +214,7 @@ func BenchmarkEvalFiveFast(b *testing.B) {
 	var deck *Deck
 	var hands = make([][]Card, 100)
 	for i := 0; i < 100; i++ {
-		deck = NewDeck()
+		deck = NewDeck(rand.NewSource(time.Now().UnixNano()))
 		deck.Shuffle()
 		hands[i] = deck.Draw(5)
 	}
@@ -228,7 +230,7 @@ func BenchmarkEvaluateFive(b *testing.B) {
 	var deck *Deck
 	var hands = make([][]Card, 100)
 	for i := 0; i < 100; i++ {
-		deck = NewDeck()
+		deck = NewDeck(rand.NewSource(time.Now().UnixNano()))
 		deck.Shuffle()
 		hands[i] = deck.Draw(5)
 	}
@@ -244,7 +246,7 @@ func BenchmarkEvaluateSeven(b *testing.B) {
 	var deck *Deck
 	var hands = make([][]Card, 100)
 	for i := 0; i < 100; i++ {
-		deck = NewDeck()
+		deck = NewDeck(rand.NewSource(time.Now().UnixNano()))
 		deck.Shuffle()
 		hands[i] = deck.Draw(7)
 	}
@@ -260,7 +262,7 @@ func BenchmarkBestHandSeven(b *testing.B) {
 	var deck *Deck
 	var hands = make([][]Card, 100)
 	for i := 0; i < 100; i++ {
-		deck = NewDeck()
+		deck = NewDeck(rand.NewSource(time.Now().UnixNano()))
 		deck.Shuffle()
 		hands[i] = deck.Draw(7)
 	}
@@ -276,7 +278,7 @@ func BenchmarkEvaluateOmaha(b *testing.B) {
 	var deck *Deck
 	var hands = make([][]Card, 100)
 	for i := 0; i < 100; i++ {
-		deck = NewDeck()
+		deck = NewDeck(rand.NewSource(time.Now().UnixNano()))
 		deck.Shuffle()
 		hands[i] = deck.Draw(9)
 	}
@@ -292,7 +294,7 @@ func BenchmarkBestOmahaHand(b *testing.B) {
 	var deck *Deck
 	var hands = make([][]Card, 100)
 	for i := 0; i < 100; i++ {
-		deck = NewDeck()
+		deck = NewDeck(rand.NewSource(time.Now().UnixNano()))
 		deck.Shuffle()
 		hands[i] = deck.Draw(9)
 	}

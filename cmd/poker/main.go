@@ -9,8 +9,7 @@ import (
 )
 
 func main() {
-	rand.Seed(time.Now().UnixNano())
-	var deck = poker.NewDeck()
+	var deck = poker.NewDeck(rand.NewSource(time.Now().UnixNano()))
 	deck.Shuffle()
 	var hand = deck.Draw(7)
 	fmt.Println(hand)

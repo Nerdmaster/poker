@@ -1,12 +1,13 @@
 package poker
 
 import (
+	"math/rand"
 	"testing"
 )
 
 func TestShuffle(t *testing.T) {
-	var d1 = NewDeck()
-	var d2 = NewDeck()
+	var d1 = NewDeck(rand.NewSource(0))
+	var d2 = NewDeck(rand.NewSource(0))
 
 	var diff bool
 	d1.Shuffle()
@@ -23,7 +24,7 @@ func TestShuffle(t *testing.T) {
 }
 
 func TestDraw(t *testing.T) {
-	var deck = NewDeck()
+	var deck = NewDeck(rand.NewSource(0))
 
 	var cards = deck.Draw(5)
 	if len(cards) != 5 {
@@ -35,7 +36,7 @@ func TestDraw(t *testing.T) {
 }
 
 func TestEmpty(t *testing.T) {
-	var deck = NewDeck()
+	var deck = NewDeck(rand.NewSource(0))
 	if deck.Empty() {
 		t.Fatalf("Newly initialized deck was empty")
 	}
