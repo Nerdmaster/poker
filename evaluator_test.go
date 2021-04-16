@@ -22,16 +22,18 @@ func TestRankString(t *testing.T) {
 		handValue uint16
 		handRank  string
 	}{
-		"398: Flush":      {398, "Flush"},
-		"2665: Two pair":  {2665, "Two Pair"},
-		"6230: High Card": {6230, "High Card"},
-		"6529: High Card": {6529, "High Card"},
-		"6823: High Card": {6823, "High Card"},
-		"2669: Two Pair":  {2669, "Two Pair"},
-		"4076: One Pair":  {4076, "One Pair"},
-		"7196: High Card": {7196, "High Card"},
-		"7221: High Card": {7221, "High Card"},
-		"6228: High Card": {6228, "High Card"},
+		"398: Flush":        {398, "Flush"},
+		"2665: Two pair":    {2665, "Two Pair"},
+		"6230: High Card":   {6230, "High Card"},
+		"6529: High Card":   {6529, "High Card"},
+		"6823: High Card":   {6823, "High Card"},
+		"2669: Two Pair":    {2669, "Two Pair"},
+		"4076: One Pair":    {4076, "One Pair"},
+		"0: Straight Flush": {0, "Straight Flush"},
+		"1607: Straight":    {1607, "Straight"},
+		"7196: High Card":   {7196, "High Card"},
+		"7221: High Card":   {7221, "High Card"},
+		"6228: High Card":   {6228, "High Card"},
 	}
 
 	for name, tc := range tests {
@@ -51,6 +53,7 @@ func TestEvaluate(t *testing.T) {
 		handRank  HandRank
 	}{
 		// Five-card hands
+		"Five-card worst hand ever": {7462, `["2s", "3d", "4c", "5h", "7h"]`, HighCard},
 		"Five-card ace high":        {6252, `["As", "Ks", "Jc", "7h", "5d"]`, HighCard},
 		"Five-card pair":            {3448, `["As", "Ac", "Jc", "7h", "5d"]`, OnePair},
 		"Five-card two pair":        {2497, `["As", "Ac", "Jc", "Jd", "5d"]`, TwoPair},
