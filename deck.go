@@ -8,8 +8,8 @@ import (
 // itself to a standard 52-card setup as well as be shuffled and have cards
 // drawn, removing them from the deck.
 type Deck struct {
-	rnd *rand.Rand
-	cards   []Card
+	rnd   *rand.Rand
+	cards CardList
 }
 
 // NewDeck returns a deck of 52 cards.  These are not shuffled in any way.
@@ -36,7 +36,7 @@ func (d *Deck) Shuffle() {
 
 // Reset puts all cards back into the deck in their original order
 func (d *Deck) Reset() {
-	d.cards = make([]Card, 52)
+	d.cards = make(CardList, 52)
 	var idx = 0
 	for rank := Deuce; rank <= Ace; rank++ {
 		for _, suit := range []CardSuit{Spades, Hearts, Diamonds, Clubs} {
@@ -49,7 +49,7 @@ func (d *Deck) Reset() {
 // Draw returns up to n cards.  If n is larger than the number of cards left in
 // the deck, only that many cards are returned.  A zero-length slice can be
 // returned if the deck is empty.
-func (d *Deck) Draw(n int) (cards []Card) {
+func (d *Deck) Draw(n int) (cards CardList) {
 	if len(d.cards) < n {
 		n = len(d.cards)
 	}

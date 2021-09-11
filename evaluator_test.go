@@ -9,15 +9,6 @@ import (
 	"time"
 )
 
-func stringifyCards(cards []Card) string {
-	var list = make([]string, len(cards))
-	for i, c := range cards {
-		list[i] = c.String()
-	}
-
-	return strings.Join(list, " ")
-}
-
 func TestRankString(t *testing.T) {
 	var tests = map[string]struct {
 		handValue uint16
@@ -94,7 +85,7 @@ func TestEvaluate(t *testing.T) {
 
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			var cards []Card
+			var cards CardList
 			var err = json.Unmarshal([]byte(tc.hand), &cards)
 			if err != nil {
 				t.Fatalf("Unmarshaling %q got an error: %s", tc.hand, err)
@@ -134,13 +125,13 @@ func TestBestHand(t *testing.T) {
 
 	for name, tc := range tests {
 		t.Run(name, func(t *testing.T) {
-			var hand []Card
+			var hand CardList
 			for _, c := range strings.Fields(tc.input) {
 				hand = append(hand, newCardString(c))
 			}
 			var _, best = BestHand(hand)
 
-			var got = stringifyCards(best[:])
+			var got = CardList(best[:]).String()
 			if got != tc.want {
 				t.Fatalf("%s gave a best hand of %s; expected %s", tc.input, got, tc.want)
 			}
@@ -177,7 +168,7 @@ var omahaTests = map[string]struct {
 func TestEvaluateOmaha(t *testing.T) {
 	for name, tc := range omahaTests {
 		t.Run(name, func(t *testing.T) {
-			var hole, community []Card
+			var hole, community CardList
 			for _, c := range strings.Fields(tc.hole) {
 				hole = append(hole, newCardString(c))
 			}
@@ -200,7 +191,7 @@ func TestEvaluateOmaha(t *testing.T) {
 func TestBestOmahaHand(t *testing.T) {
 	for name, tc := range omahaTests {
 		t.Run(name, func(t *testing.T) {
-			var hole, community []Card
+			var hole, community CardList
 			for _, c := range strings.Fields(tc.hole) {
 				hole = append(hole, newCardString(c))
 			}
@@ -209,8 +200,8 @@ func TestBestOmahaHand(t *testing.T) {
 			}
 
 			var _, bestH, bestC = BestOmahaHand(hole, community)
-			var gotHole = stringifyCards(bestH[:])
-			var gotComm = stringifyCards(bestC[:])
+			var gotHole = CardList(bestH[:]).String()
+			var gotComm = CardList(bestC[:]).String()
 			if gotHole != tc.bestHole || gotComm != tc.bestComm {
 				t.Fatalf("%s,%s: expected %s,%s to be best, but got %s,%s", hole, community, tc.bestHole, tc.bestComm, gotHole, gotComm)
 			}
@@ -220,7 +211,7 @@ func TestBestOmahaHand(t *testing.T) {
 
 func BenchmarkEvalFiveFast(b *testing.B) {
 	var deck *Deck
-	var hands = make([][]Card, 100)
+	var hands = make([]CardList, 100)
 	for i := 0; i < 100; i++ {
 		deck = NewDeck(rand.NewSource(time.Now().UnixNano()))
 		deck.Shuffle()
@@ -236,7 +227,7 @@ func BenchmarkEvalFiveFast(b *testing.B) {
 
 func BenchmarkEvaluateFive(b *testing.B) {
 	var deck *Deck
-	var hands = make([][]Card, 100)
+	var hands = make([]CardList, 100)
 	for i := 0; i < 100; i++ {
 		deck = NewDeck(rand.NewSource(time.Now().UnixNano()))
 		deck.Shuffle()
@@ -252,7 +243,7 @@ func BenchmarkEvaluateFive(b *testing.B) {
 
 func BenchmarkEvaluateSeven(b *testing.B) {
 	var deck *Deck
-	var hands = make([][]Card, 100)
+	var hands = make([]CardList, 100)
 	for i := 0; i < 100; i++ {
 		deck = NewDeck(rand.NewSource(time.Now().UnixNano()))
 		deck.Shuffle()
@@ -268,7 +259,7 @@ func BenchmarkEvaluateSeven(b *testing.B) {
 
 func BenchmarkBestHandSeven(b *testing.B) {
 	var deck *Deck
-	var hands = make([][]Card, 100)
+	var hands = make([]CardList, 100)
 	for i := 0; i < 100; i++ {
 		deck = NewDeck(rand.NewSource(time.Now().UnixNano()))
 		deck.Shuffle()
@@ -284,7 +275,7 @@ func BenchmarkBestHandSeven(b *testing.B) {
 
 func BenchmarkEvaluateOmaha(b *testing.B) {
 	var deck *Deck
-	var hands = make([][]Card, 100)
+	var hands = make([]CardList, 100)
 	for i := 0; i < 100; i++ {
 		deck = NewDeck(rand.NewSource(time.Now().UnixNano()))
 		deck.Shuffle()
@@ -300,7 +291,7 @@ func BenchmarkEvaluateOmaha(b *testing.B) {
 
 func BenchmarkBestOmahaHand(b *testing.B) {
 	var deck *Deck
-	var hands = make([][]Card, 100)
+	var hands = make([]CardList, 100)
 	for i := 0; i < 100; i++ {
 		deck = NewDeck(rand.NewSource(time.Now().UnixNano()))
 		deck.Shuffle()
