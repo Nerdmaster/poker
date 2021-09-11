@@ -11,7 +11,6 @@ type HandResult struct {
 	best        [5]Card
 	Best5       CardList
 	Rank        HandRank
-	Description string
 	Score       uint16
 }
 

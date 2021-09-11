@@ -6,22 +6,8 @@ import (
 	"strings"
 )
 
-// HandError is a simple string wrapper to make constants into usable and
-// meaningful returned error values
-type HandError string
-
-// Hand errors
-const (
-	ErrEmptyDeck        HandError = "cannot draw from empty deck"
-	ErrInvalidCardCount HandError = "invalid card count"
-)
-
-func (e HandError) Error() string {
-	return string(e)
-}
-
 // A Hand is just a CardList with user-specific behaviors. It could be a
-// five-card draw hand, hole cards, etc.
+// five-card draw hand, hole cards, etc. Hand implements CardReceiver.
 //
 // Hand is primarily built for higher-level interactions than the low-level
 // Card-based functions, but it's really nothing more than a list of cards with
