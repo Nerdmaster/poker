@@ -38,16 +38,6 @@ func NewHand(cards CardList) *Hand {
 	return &Hand{cards: cards}
 }
 
-// Deal adds a card to the hand from the given Deck. If the deck is empty, an error is returned.
-func (h *Hand) Deal(d *Deck) error {
-	if d.Empty() {
-		return ErrEmptyDeck
-	}
-	h.cards = append(h.cards, d.Draw(1)...)
-
-	return nil
-}
-
 // String returns a human-readable(ish) string representing the hand
 func (h *Hand) String() string {
 	var list = make([]string, len(h.cards))
@@ -97,4 +87,9 @@ func (h *Hand) Evaluate(community ...Card) (hr *HandResult, err error) {
 	hr.Rank = GetHandRank(hr.Score)
 	hr.sort()
 	return hr, nil
+}
+
+// AddCard puts the card into this player's hand
+func (h *Hand) AddCard(c Card) {
+	h.cards = append(h.cards, c)
 }

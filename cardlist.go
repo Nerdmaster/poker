@@ -31,3 +31,7 @@ func (cards CardList) String() string {
 
 	return strings.Join(slist, " ")
 }
+
+func (cards *CardList) AddCard(c Card) {
+	*cards = append(*cards, c)
+}

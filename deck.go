@@ -4,6 +4,11 @@ import (
 	"math/rand"
 )
 
+// CardReceiver is anything which can be given a Card
+type CardReceiver interface {
+	AddCard(Card)
+}
+
 // A Deck is a magical list of cards that happens to be able to initialize
 // itself to a standard 52-card setup as well as be shuffled and have cards
 // drawn, removing them from the deck.
@@ -56,6 +61,18 @@ func (d *Deck) Draw(n int) (cards CardList) {
 
 	cards, d.cards = d.cards[:n], d.cards[n:]
 	return cards
+}
+
+// Deal adds a card to the given card receiver, removing it from the deck. An error is
+// returned if there are no cards available.
+func (d *Deck) Deal(i CardReceiver) error {
+	if d.Empty() {
+		return ErrEmptyDeck
+	}
+	var cards = d.Draw(1)
+	i.AddCard(cards[0])
+
+	return nil
 }
 
 // Count returns the number of cards left in the deck
