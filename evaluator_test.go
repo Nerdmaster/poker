@@ -2,6 +2,7 @@ package poker
 
 import (
 	"encoding/json"
+	"math"
 	"math/rand"
 	"strings"
 	"testing"
@@ -85,6 +86,10 @@ func TestEvaluate(t *testing.T) {
 		"Seven-card full house":      {298, `["2d", "3d", "4s", "4c", "4d", "2s", "2h"]`, FullHouse},
 		"Seven-card four of a kind":  {19, `["2d", "3d", "As", "Ac", "Ad", "Ah", "5h"]`, FourOfAKind},
 		"Seven-card straight flush":  {1, `["2d", "3d", "As", "Ks", "Qs", "Js", "Ts"]`, StraightFlush},
+
+		// Invalid hands
+		"Four cards":  {math.MaxUint16, `["Ks", "Qs", "Js", "Ts"]`, HighCard},
+		"Eight cards": {math.MaxUint16, `["Tc", "2d", "3d", "As", "Ks", "Qs", "Js", "Ts"]`, HighCard},
 	}
 
 	for name, tc := range tests {

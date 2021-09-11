@@ -38,7 +38,7 @@ func Evaluate(c []Card) uint16 {
 	if len(c) == 5 {
 		return evalFiveFast(c[0], c[1], c[2], c[3], c[4])
 	}
-	if len(c) < 5 || len(c) > 8 {
+	if len(c) < 5 || len(c) > 7 {
 		return math.MaxUint16
 	}
 
