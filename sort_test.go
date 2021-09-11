@@ -39,8 +39,9 @@ func TestSortAceLow(t *testing.T) {
 		input    string
 		expected string
 	}{
-		"Low straight":  {"2d 5d Ad 3d 4d", "5d 4d 3d 2d Ad"},
-		"High straight": {"Ks Jh Qd As Td", "Ks Qd Jh Td As"},
+		"Low straight":                 {"2d 5d Ad 3d 4d", "5d 4d 3d 2d Ad"},
+		"Another low because it broke": {"Ac Kd 4h 5d 3d Kc 2c", "Kc Kd 5d 4h 3d 2c Ac"},
+		"High straight":                {"Ks Jh Qd As Td", "Ks Qd Jh Td As"},
 	}
 
 	for name, tc := range tests {

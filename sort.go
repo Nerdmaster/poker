@@ -28,7 +28,7 @@ func (c CardList) SortAceLow() {
 			return c[i] > c[j]
 		}
 
-		var xI, xJ = int(rI), int(rJ)
+		var xI, xJ = int(rI) + 1, int(rJ) + 1
 		if rI == Ace {
 			xI = 0
 		}
