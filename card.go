@@ -41,6 +41,74 @@ var charToCardRank = map[byte]CardRank{
 	'A': Ace,
 }
 
+// Name returns the full text name for a card's rank
+func (r CardRank) Name() string {
+	switch r {
+	case Deuce:
+		return "Two"
+	case Three:
+		return "Three"
+	case Four:
+		return "Four"
+	case Five:
+		return "Five"
+	case Six:
+		return "Six"
+	case Seven:
+		return "Seven"
+	case Eight:
+		return "Eight"
+	case Nine:
+		return "Nine"
+	case Ten:
+		return "Ten"
+	case Jack:
+		return "Jack"
+	case Queen:
+		return "Queen"
+	case King:
+		return "King"
+	case Ace:
+		return "Ace"
+	}
+
+	return ""
+}
+
+// Plural returns the plural form of the given rank
+func (r CardRank) Plural() string {
+	switch r {
+	case Deuce:
+		return "Twos"
+	case Three:
+		return "Threes"
+	case Four:
+		return "Fours"
+	case Five:
+		return "Fives"
+	case Six:
+		return "Sixes"
+	case Seven:
+		return "Sevens"
+	case Eight:
+		return "Eights"
+	case Nine:
+		return "Nines"
+	case Ten:
+		return "Tens"
+	case Jack:
+		return "Jacks"
+	case Queen:
+		return "Queens"
+	case King:
+		return "Kings"
+	case Ace:
+		return "Aces"
+	}
+
+	return ""
+}
+
 func (r CardRank) String() string {
 	switch r {
 	case Deuce:
