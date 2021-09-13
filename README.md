@@ -84,15 +84,25 @@ meant to be used in other projects? Nope.
 
 ---
 
-On my local system, which is pretty fast, this suite can do about 5 million
-seven-card hands per second, and over 100 million five-card hands per second:
+On my local system, which is pretty fast, running Go 1.17.1:
 
 ```
 pkg: github.com/Nerdmaster/poker
-BenchmarkEvalFiveFast-16        165811814                7.08 ns/op            0 B/op          0 allocs/op
-BenchmarkEvaluateFive-16        134446173                8.73 ns/op            0 B/op          0 allocs/op
-BenchmarkEvaluateSeven-16        5980243               195 ns/op               0 B/op          0 allocs/op
+BenchmarkNewCard-16             1000000000               1.298 ns/op           0 B/op          0 allocs/op
+BenchmarkNewCardString-16       373777461               31.84 ns/op            0 B/op          0 allocs/op
+BenchmarkEvalFiveFast-16        1000000000               6.422 ns/op           0 B/op          0 allocs/op
+BenchmarkEvaluateFive-16        1000000000               6.888 ns/op           0 B/op          0 allocs/op
+BenchmarkEvaluateSeven-16       81180350               145.0 ns/op             0 B/op          0 allocs/op
+BenchmarkBestHandSeven-16       77212557               150.0 ns/op             0 B/op          0 allocs/op
+BenchmarkEvaluateOmaha-16       26755777               416.1 ns/op             0 B/op          0 allocs/op
+BenchmarkBestOmahaHand-16       28537060               417.3 ns/op             0 B/op          0 allocs/op
 ```
+
+Breaking it down:
+
+- Over 150 million five-card hands evaluated per second
+- 6.5 million seven-card hands per second
+- Over 2 million nine-card Omaha hands per second
 
 I looked over the best pure go package I was able to find
 ([chehsunliu/poker](https://github.com/chehsunliu/poker)) so I could do some
@@ -100,17 +110,20 @@ benchmarking against it. Because its benchmarks actually evaluate several hands
 per loop, it was easiest to shim my package into their benchmarking suite in
 order to get a one-to-one comparison.
 
+*This was run just minutes after the prior one. Same hardware, same version of
+Go.  Same bash process, even.*
+
 ```
 pkg: github.com/chehsunliu/poker
-BenchmarkFiveNerdmaster-16      173458536               68.7 ns/op             0 B/op          0 allocs/op
-BenchmarkFivePoker-16           69460522               172 ns/op               0 B/op          0 allocs/op
-BenchmarkFiveJoker-16             375366             32068 ns/op           14433 B/op        657 allocs/op
-BenchmarkSixNerdmaster-16       22927119               520 ns/op               0 B/op          0 allocs/op
-BenchmarkSixPoker-16             8416456              1419 ns/op             288 B/op          9 allocs/op
-BenchmarkSixJoker-16               74277            161396 ns/op           67972 B/op       2923 allocs/op
-BenchmarkSevenNerdmaster-16      6978400              1715 ns/op               0 B/op          0 allocs/op
-BenchmarkSevenPoker-16           1000000             11050 ns/op            2304 B/op         72 allocs/op
-BenchmarkSevenJoker-16             20720            579313 ns/op          265405 B/op      10231 allocs/op
+BenchmarkFiveNerdmaster-16      124406692               48.14 ns/op
+BenchmarkFivePoker-16           43291016               141.2 ns/op
+BenchmarkFiveJoker-16             183366             32632 ns/op
+BenchmarkSixNerdmaster-16       16036488               375.5 ns/op
+BenchmarkSixPoker-16             4487058              1330 ns/op
+BenchmarkSixJoker-16               36391            164378 ns/op
+BenchmarkSevenNerdmaster-16      4684904              1263 ns/op
+BenchmarkSevenPoker-16            567606             10406 ns/op
+BenchmarkSevenJoker-16             10000            588856 ns/op
 ```
 
 My implementation absolutely crushes the "Joker" approach, and handily beats
@@ -118,11 +131,10 @@ chehsunliu's:
 
 - No memory is allocated on the heap in any cases. If you use a package to
   implement a long-running poker game server, this can be critical.
-- The seven-card case is over 7x faster, simply because I pregenerate the list
-  of all possible five-card hands. It's only 21 items, man! Come on!
-- Even the five-card case, which I thought would be equivalent, is 2.5x faster
-  than chehsunliu's, which I don't entirely understand given how similar our
-  approaches are. Maybe that package uses an outdated lookup table...?
+- The seven-card case is just over 8x faster than chehsunliu's, which makes
+  sense given the simpler logic I use
+- Even the five-card case, which I thought would be equivalent, is nearly 3x
+  faster than chehsunliu's
 
 ## Caveat
 
@@ -160,14 +172,14 @@ that I just can't accept, even in a hobby project like this:
 
 - It doesn't let you specify a randomization source, meaning it's never a good
   fit for anything remotely secure
-- Its evaluation logic is slow despite using a prebuilt lookup table (which I
-  also do here, so... wtf)
+- Its evaluation logic is "fast enough", but still slower than I'd expect
 - The seven-card hand eval is really awful. It doesn't pregenerate the list of
   permutations, which means a really slow brute-force compared to what I
   trivially whipped up.
 - It instantiates a global object for the "master" deck, which is just...  so
-  wild to me. Putting a global into the code to speed up deck creation, but
-  doing seven-card eval the way it does...?
+  wild to me. Putting a global into the code to speed up deck creation? But the
+  slow part of building a deck is *shuffling*, not filling it! And then doing
+  seven-card eval the way it does...? Weird choice for optimizations, man.
 
 I started off thinking I'd submit a PR to improve performance, but the API
 being what it is, particularly the inability to customize the randomization
