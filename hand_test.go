@@ -115,3 +115,37 @@ func TestHandDescribe(t *testing.T) {
 		})
 	}
 }
+
+func TestOmahaHands(t *testing.T) {
+	var tests = map[string]struct {
+		hole string
+		comm string
+		best string
+		desc string
+	}{
+		"Flop: trips": {"2c 7h 4d Ad", "2d 8c 2h", "2c 2d 2h Ad 8c", "Three Of A Kind, Twos"},
+		"Turn: trips":  {"2c 7h 4d Ad", "2d 8c 2h Ks", "2c 2d 2h Ad Ks", "Three Of A Kind, Twos"},
+		"River: FH":    {"2c 7h 4d Ad", "2d 8c 2h Ks 4s", "2c 2d 2h 4d 4s", "Full House, Twos Over Fours"},
+		"Flop: high":   {"2c 7h 4d Ad", "3s 6d 8c", "Ad 8c 7h 6d 3s", "Ace High"},
+		"Turn: high":   {"2c 7h 4d Ad", "3s 6d 8c Kc", "Ad Kc 8c 7h 6d", "Ace High"},
+		"River: high":  {"2c 7h 4d Ad", "3s 6d 8c Kc Jc", "Ad Kc Jc 8c 7h", "Ace High"},
+		"Flop: high 2": {"2c 7h 4d Jd", "3d Tc 9d", "Jd Tc 9d 7h 3d", "Jack High"},
+		"Turn: Pair":   {"2c 6h 4d Jd", "3d Tc 9d 6s", "6h 6s Jd Tc 9d", "One Pair, Sixes"},
+		"River: Flush": {"2c 7h 4d Jd", "3d Tc 9d 5s Td", "Jd Td 9d 4d 3d", "Jack-High Flush"},
+	}
+
+	// We have so many tests that we're deliberately not checking these ones for
+	// errors. If something above causes a parse/eval error, it will be caught in
+	// lower-level testing
+	for name, tc := range tests {
+		t.Run(name, func(t *testing.T) {
+			var hand, _ = makeHand(tc.hole)
+			var comm, _ = ParseCards(tc.comm)
+			var res, _ = hand.Evaluate(comm...)
+
+			if res.Best5.String() != tc.best {
+				t.Errorf("Expected %q / %q to have %q as best hand, got %q", tc.hole, tc.comm, tc.best, res.Best5)
+			}
+		})
+	}
+}

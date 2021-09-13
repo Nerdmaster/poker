@@ -163,6 +163,17 @@ var omahaTests = map[string]struct {
 	"Two pair":   {2853, "2c Jd 8h 4h", "Jc 8d 3h Qs Ad", TwoPair, "Jd 8h", "Jc 8d Ad"},
 	"One pair":   {5093, "7h As Jc 6d", "6s Kd 2s 4s 3d", OnePair, "As 6d", "6s Kd 4s"},
 	"Full House": {288, "Kc 2s 4c Qd", "3h 7c 4d 4s Kd", FullHouse, "Kc 4c", "4d 4s Kd"},
+
+	// Finally, flop-to-river hands to verify how our Omaha rules handle 7 and 8 cards
+	"Flop: trips":  {2407, "2c 7h 4d Ad", "2d 8c 2h", ThreeOfAKind, "2c Ad", "2d 8c 2h"},
+	"Turn: trips":  {2402, "2c 7h 4d Ad", "2d 8c 2h Ks", ThreeOfAKind, "2c Ad", "2d 2h Ks"},
+	"River: FH":    {321, "2c 7h 4d Ad", "2d 8c 2h Ks 4s", FullHouse, "2c 4d", "2d 2h 4s"},
+	"Flop: high":   {6647, "2c 7h 4d Ad", "3s 6d 8c", HighCard, "7h Ad", "3s 6d 8c"},
+	"Turn: high":   {6315, "2c 7h 4d Ad", "3s 6d 8c Kc", HighCard, "7h Ad", "6d 8c Kc"},
+	"River: high":  {6245, "2c 7h 4d Ad", "3s 6d 8c Kc Jc", HighCard, "7h Ad", "8c Kc Jc"},
+	"Flop: high 2": {6303, "2c 7h 4d Ad", "3d Kc 9d", HighCard, "7h Ad", "3d Kc 9d"},
+	"Turn: Pair":   {5969, "2c 7h 4d Ad", "3d Kc 9d 2s", OnePair, "2c Ad", "Kc 9d 2s"},
+	"River: Flush": {709, "2c 7h 4d Ad", "3d Kc 9d 2s Td", Flush, "4d Ad", "3d 9d Td"},
 }
 
 func TestEvaluateOmaha(t *testing.T) {

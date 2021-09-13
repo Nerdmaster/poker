@@ -132,15 +132,17 @@ var omahaHolePerms = [][2]int{
 	{2, 3},
 }
 
-// all permutations of the five community cards in Omaha - exactly three must be used
+// all permutations of the five community cards in Omaha - exactly three must
+// be used. If we have 3 community cards, only the first permutation has any
+// meaning. With four community cards, the first 4 permutations are used.
 var omahaCommunityPerms = [][3]int{
 	{0, 1, 2},
 	{0, 1, 3},
-	{0, 1, 4},
 	{0, 2, 3},
+	{1, 2, 3},
+	{0, 1, 4},
 	{0, 2, 4},
 	{0, 3, 4},
-	{1, 2, 3},
 	{1, 2, 4},
 	{1, 3, 4},
 	{2, 3, 4},
@@ -173,17 +175,26 @@ func (cl CardList) evalMore() uint16 {
 // EvaluateOmaha returns the best five-card hand value that can be generated
 // give four hole cards and five community cards.
 //
-// Omaha has nine cards, but the rules require you to use exactly two of them
+// Omaha has seven to nine cards depending if we're on the flop, the turn, or
+// the river. But the rules require you to use exactly two of your hole cards
 // to make a hand.  This might seem complicated, but it drastically reduces the
 // permutations compared to a full nine-card evaluation.
 func (cl CardList) EvaluateOmaha(community CardList) uint16 {
-	var minimum uint16 = math.MaxUint16
-	if len(cl) != 4 || len(community) != 5 {
-		return minimum
+	var cPerms [][3]int
+	switch len(community) {
+	case 3:
+		cPerms = omahaCommunityPerms[:1]
+	case 4:
+		cPerms = omahaCommunityPerms[:4]
+	case 5:
+		cPerms = omahaCommunityPerms
+	default:
+		return math.MaxUint16
 	}
 
+	var minimum uint16 = math.MaxUint16
 	for _, holeP := range omahaHolePerms {
-		for _, commP := range omahaCommunityPerms {
+		for _, commP := range cPerms {
 			var score = evalFiveFast(
 				cl[holeP[0]],
 				cl[holeP[1]],
@@ -206,12 +217,20 @@ func (cl CardList) EvaluateOmaha(community CardList) uint16 {
 // many permutations of Omaha hand possibilities.
 func (cl CardList) BestOmahaHand(community []Card) (score uint16, bestH [2]Card, bestC [3]Card) {
 	score = math.MaxUint16
-	if len(cl) != 4 || len(community) != 5 {
-		return
+	var cPerms [][3]int
+	switch len(community) {
+	case 3:
+		cPerms = omahaCommunityPerms[:1]
+	case 4:
+		cPerms = omahaCommunityPerms[:4]
+	case 5:
+		cPerms = omahaCommunityPerms
+	default:
+		return math.MaxUint16, bestH, bestC
 	}
 
 	for _, holeP := range omahaHolePerms {
-		for _, commP := range omahaCommunityPerms {
+		for _, commP := range cPerms {
 			var eval = evalFiveFast(
 				cl[holeP[0]],
 				cl[holeP[1]],
