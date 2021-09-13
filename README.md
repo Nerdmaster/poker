@@ -51,9 +51,10 @@ Or just look at the source for the example file(s).
 That said, here's some basic info at a glance:
 
 - Create a Deck: `var deck = poker.NewDeck(rand.NewSource(time.Now().UnixNano()))`
-  - Using `math/rand`, especially with `time.Now()` is **not secure**. This is
-    a simple example. Use a real source of randomness for this! The point here
-    is that my poker package *allows any random source*.
+  - Using `math/rand.NewSource` is **not secure** even if you use a "secure"
+    seed value. This is a simple example. Use a real source of randomness for
+    this for anything serious! The point here is that my poker package *allows
+    any random source*.
 - Create an empty hand and add a card to it: `var hand = poker.NewHand(nil); deck.Deal(hand)`
 - Or create a hand from a list of drawn cards: `var hand = poker.NewHand(deck.Draw(5))`
 - Evaluate a hand: `var res, err = hand.Evaluate()`
