@@ -6,12 +6,12 @@ import "fmt"
 // the source cards (user and community), the five cards that made the best
 // hand, sorted for readability, a raw score, and a human-friendly description.
 type HandResult struct {
-	Hand        CardList
-	Community   CardList
-	best        [5]Card
-	Best5       CardList
-	Rank        HandRank
-	Score       uint16
+	Hand      CardList
+	Community CardList
+	best      [5]Card
+	Best5     CardList
+	Rank      HandRank
+	Score     uint16
 }
 
 func (hr *HandResult) evaluateRaw() error {
@@ -19,7 +19,7 @@ func (hr *HandResult) evaluateRaw() error {
 		return fmt.Errorf("evaluateRaw(): %w", ErrInvalidCardCount)
 	}
 
-	hr.Score, hr.best = BestHand(hr.Hand)
+	hr.Score, hr.best = hr.Hand.BestHand()
 	return nil
 }
 
@@ -29,7 +29,7 @@ func (hr *HandResult) evaluateTexas() error {
 	}
 
 	var eval = append(hr.Hand, hr.Community...)
-	hr.Score, hr.best = BestHand(eval)
+	hr.Score, hr.best = eval.BestHand()
 	return nil
 }
 
@@ -40,7 +40,7 @@ func (hr *HandResult) evaluateOmaha() error {
 
 	var bestH [2]Card
 	var bestC [3]Card
-	hr.Score, bestH, bestC = BestOmahaHand(hr.Hand, hr.Community)
+	hr.Score, bestH, bestC = hr.Hand.BestOmahaHand(hr.Community)
 	hr.best = [5]Card{bestH[0], bestH[1], bestC[0], bestC[1], bestC[2]}
 	return nil
 }

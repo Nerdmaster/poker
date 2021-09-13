@@ -34,55 +34,55 @@ func findFast(prod uint32) uint32 {
 // worst-possible high card (2, 3, 4, 5, 7) being 7462.
 //
 // Hands can be 5, 6, or 7 cards, otherwise the return will be math.MaxUint16.
-func Evaluate(c []Card) uint16 {
-	if len(c) == 5 {
-		return evalFiveFast(c[0], c[1], c[2], c[3], c[4])
+func (cl CardList) Evaluate() uint16 {
+	if len(cl) == 5 {
+		return evalFiveFast(cl[0], cl[1], cl[2], cl[3], cl[4])
 	}
-	if len(c) < 5 || len(c) > 7 {
+	if len(cl) < 5 || len(cl) > 7 {
 		return math.MaxUint16
 	}
 
-	return evalMore(c)
+	return cl.evalMore()
 }
 
 // BestHand returns the same score as Evaluate, but also the full set of five
 // cards that made up the best hand.  In cases where you only have five card,
 // this is useless, but it can be more helpful when trying to see *why* a given
 // seven-card hand won, especially for Poker novices.
-func BestHand(cards []Card) (score uint16, best [5]Card) {
+func (cl CardList) BestHand() (score uint16, best [5]Card) {
 	score = math.MaxUint16
-	if len(cards) < 5 || len(cards) > 7 {
+	if len(cl) < 5 || len(cl) > 7 {
 		return
 	}
-	if len(cards) == 5 {
-		best[0] = cards[0]
-		best[1] = cards[1]
-		best[2] = cards[2]
-		best[3] = cards[3]
-		best[4] = cards[4]
-		return evalFiveFast(cards[0], cards[1], cards[2], cards[3], cards[4]), best
+	if len(cl) == 5 {
+		best[0] = cl[0]
+		best[1] = cl[1]
+		best[2] = cl[2]
+		best[3] = cl[3]
+		best[4] = cl[4]
+		return evalFiveFast(cl[0], cl[1], cl[2], cl[3], cl[4]), best
 	}
 
 	var perms = perms7
-	if len(cards) == 6 {
+	if len(cl) == 6 {
 		perms = perms6
 	}
 
 	for _, perm := range perms {
 		var val = evalFiveFast(
-			cards[perm[0]],
-			cards[perm[1]],
-			cards[perm[2]],
-			cards[perm[3]],
-			cards[perm[4]],
+			cl[perm[0]],
+			cl[perm[1]],
+			cl[perm[2]],
+			cl[perm[3]],
+			cl[perm[4]],
 		)
 		if val < score {
 			score = val
-			best[0] = cards[perm[0]]
-			best[1] = cards[perm[1]]
-			best[2] = cards[perm[2]]
-			best[3] = cards[perm[3]]
-			best[4] = cards[perm[4]]
+			best[0] = cl[perm[0]]
+			best[1] = cl[perm[1]]
+			best[2] = cl[perm[2]]
+			best[3] = cl[perm[3]]
+			best[4] = cl[perm[4]]
 		}
 	}
 
@@ -146,21 +146,21 @@ var omahaCommunityPerms = [][3]int{
 	{2, 3, 4},
 }
 
-func evalMore(cards []Card) uint16 {
+func (cl CardList) evalMore() uint16 {
 	var minimum uint16 = math.MaxUint16
 
 	var perms = perms7
-	if len(cards) == 6 {
+	if len(cl) == 6 {
 		perms = perms6
 	}
 
 	for _, perm := range perms {
 		var score = evalFiveFast(
-			cards[perm[0]],
-			cards[perm[1]],
-			cards[perm[2]],
-			cards[perm[3]],
-			cards[perm[4]],
+			cl[perm[0]],
+			cl[perm[1]],
+			cl[perm[2]],
+			cl[perm[3]],
+			cl[perm[4]],
 		)
 		if score < minimum {
 			minimum = score
@@ -176,17 +176,17 @@ func evalMore(cards []Card) uint16 {
 // Omaha has nine cards, but the rules require you to use exactly two of them
 // to make a hand.  This might seem complicated, but it drastically reduces the
 // permutations compared to a full nine-card evaluation.
-func EvaluateOmaha(hole, community []Card) uint16 {
+func (cl CardList) EvaluateOmaha(community CardList) uint16 {
 	var minimum uint16 = math.MaxUint16
-	if len(hole) != 4 || len(community) != 5 {
+	if len(cl) != 4 || len(community) != 5 {
 		return minimum
 	}
 
 	for _, holeP := range omahaHolePerms {
 		for _, commP := range omahaCommunityPerms {
 			var score = evalFiveFast(
-				hole[holeP[0]],
-				hole[holeP[1]],
+				cl[holeP[0]],
+				cl[holeP[1]],
 				community[commP[0]],
 				community[commP[1]],
 				community[commP[2]],
@@ -204,24 +204,24 @@ func EvaluateOmaha(hole, community []Card) uint16 {
 // function can be streamlined for cases where speed is of the essence, where
 // this is more useful when you need to present what actually "won" out of the
 // many permutations of Omaha hand possibilities.
-func BestOmahaHand(hole, community []Card) (score uint16, bestH [2]Card, bestC [3]Card) {
+func (cl CardList) BestOmahaHand(community []Card) (score uint16, bestH [2]Card, bestC [3]Card) {
 	score = math.MaxUint16
-	if len(hole) != 4 || len(community) != 5 {
+	if len(cl) != 4 || len(community) != 5 {
 		return
 	}
 
 	for _, holeP := range omahaHolePerms {
 		for _, commP := range omahaCommunityPerms {
 			var eval = evalFiveFast(
-				hole[holeP[0]],
-				hole[holeP[1]],
+				cl[holeP[0]],
+				cl[holeP[1]],
 				community[commP[0]],
 				community[commP[1]],
 				community[commP[2]],
 			)
 			if eval < score {
-				bestH[0] = hole[holeP[0]]
-				bestH[1] = hole[holeP[1]]
+				bestH[0] = cl[holeP[0]]
+				bestH[1] = cl[holeP[1]]
 				bestC[0] = community[commP[0]]
 				bestC[1] = community[commP[1]]
 				bestC[2] = community[commP[2]]

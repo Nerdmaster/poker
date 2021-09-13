@@ -91,7 +91,7 @@ func TestEvaluate(t *testing.T) {
 				t.Fatalf("Unmarshaling %q got an error: %s", tc.hand, err)
 			}
 
-			var handVal = Evaluate(cards)
+			var handVal = cards.Evaluate()
 			var handRank = GetHandRank(handVal)
 			if handVal != tc.handValue {
 				t.Fatalf("%s gave a hand value of %d; expected %d", cards, handVal, tc.handValue)
@@ -129,7 +129,7 @@ func TestBestHand(t *testing.T) {
 			for _, c := range strings.Fields(tc.input) {
 				hand = append(hand, newCardString(c))
 			}
-			var _, best = BestHand(hand)
+			var _, best = hand.BestHand()
 
 			var got = CardList(best[:]).String()
 			if got != tc.want {
@@ -176,7 +176,7 @@ func TestEvaluateOmaha(t *testing.T) {
 				community = append(community, newCardString(c))
 			}
 
-			var handVal = EvaluateOmaha(hole, community)
+			var handVal = hole.EvaluateOmaha(community)
 			var handRank = GetHandRank(handVal)
 			if handRank != tc.handRank {
 				t.Fatalf("%s,%s gave a hand rank of %q; expected %q", hole, community, handRank, tc.handRank)
@@ -199,7 +199,7 @@ func TestBestOmahaHand(t *testing.T) {
 				community = append(community, newCardString(c))
 			}
 
-			var _, bestH, bestC = BestOmahaHand(hole, community)
+			var _, bestH, bestC = hole.BestOmahaHand(community)
 			var gotHole = CardList(bestH[:]).String()
 			var gotComm = CardList(bestC[:]).String()
 			if gotHole != tc.bestHole || gotComm != tc.bestComm {
@@ -237,7 +237,7 @@ func BenchmarkEvaluateFive(b *testing.B) {
 	var hl = len(hands)
 	for i := 0; i < b.N; i++ {
 		var hand = hands[i%hl]
-		Evaluate(hand)
+		hand.Evaluate()
 	}
 }
 
@@ -253,7 +253,7 @@ func BenchmarkEvaluateSeven(b *testing.B) {
 	var hl = len(hands)
 	for i := 0; i < b.N; i++ {
 		var hand = hands[i%hl]
-		Evaluate(hand)
+		hand.Evaluate()
 	}
 }
 
@@ -269,7 +269,7 @@ func BenchmarkBestHandSeven(b *testing.B) {
 	var hl = len(hands)
 	for i := 0; i < b.N; i++ {
 		var hand = hands[i%hl]
-		BestHand(hand)
+		hand.BestHand()
 	}
 }
 
@@ -285,7 +285,7 @@ func BenchmarkEvaluateOmaha(b *testing.B) {
 	var hl = len(hands)
 	for i := 0; i < b.N; i++ {
 		var hand = hands[i%hl]
-		EvaluateOmaha(hand[:4], hand[4:])
+		CardList(hand[:4]).EvaluateOmaha(hand[4:])
 	}
 }
 
@@ -301,6 +301,6 @@ func BenchmarkBestOmahaHand(b *testing.B) {
 	var hl = len(hands)
 	for i := 0; i < b.N; i++ {
 		var hand = hands[i%hl]
-		BestOmahaHand(hand[:4], hand[4:])
+		CardList(hand[:4]).EvaluateOmaha(hand[4:])
 	}
 }
