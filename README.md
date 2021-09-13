@@ -13,21 +13,23 @@ displays winners and their hands.
 
 The low-level API is somewhat cryptic at first glance:
 
-- `poker.Evaluate` takes a slice of `Card`s and returns a number
-  - If you pass in five cards, they're evaluated as-is
-  - If you pass in six or seven cards, all possible five-card permutations are
+- Everything starts with a `CardList`, which is just a slice of `Card`s. Create
+  a cardlist with a string, e.g., `var cards = poker.ParseCards("Ah Qh Kh Th Jh")`
+- `cards.Evaluate` returns a number:
+  - If you have five cards, they're evaluated as-is
+  - If you have six or seven cards, all possible five-card permutations are
     computed to find the best score
   - The lower the number, the better the hand
 - Call `poker.GetHandRank` on a hand's value to get its hand rank (e.g., Flush,
   Straight, Two pair, etc.)
 - If you need to determine which five cards made up the best hand,
-  `poker.BestHand` returns both a score and the combination of cards which had
+  `cards.BestHand` returns both a score and the combination of cards which had
   that score
 - There are Omaha variations of these functions as well, since Omaha has
   somewhat unusual rules for how you have to use the four hole cards
-  - `poker.EvaluateOmaha` returns the score for the best Omaha hand given four
+  - `cards.EvaluateOmaha` returns the score for the best Omaha hand given four
     hole cards and five community cards
-  - `poker.BestOmahaHand` is just like `poker.BestHand`, but with the same
+  - `cards.BestOmahaHand` is just like `poker.BestHand`, but with the same
     input as above: four hole cards and five community cards
 
 Surprisingly, the `Best*` functions are only about 10% slower than their
@@ -39,7 +41,14 @@ where the caller might want to report more than simply the hand rank.
 The high-level APIs, on the other hand, should be pretty easy to use. Create a
 deck, deal cards into a hand / community card list, and evaluate things.
 
-At a glance:
+It's easier to show an example and its output than to bother explaining this
+all here. Fortunately, Go really kicks ass at that kind of documentation, so
+check out the runnable examples in
+[the official docs](https://pkg.go.dev/github.com/Nerdmaster/poker#section-documentation).
+
+Or just look at the source for the example file(s).
+
+That said, here's some basic info at a glance:
 
 - Create a Deck: `var deck = poker.NewDeck(rand.NewSource(time.Now().UnixNano()))`
   - Using `time.Now()` is **not secure**. This is a simple example. Use a real
@@ -53,12 +62,10 @@ The `Evaluate` method takes an optional list of community cards. If those are
 present, the hand to evaluate may be two cards for Texas Hold 'Em rules or four
 cards for Omaha Hold 'Em rules.
 
----
-
-It's easier to show an example and its output than to bother explaining this
-all here. Fortunately, Go really kicks ass at that kind of documentation, so
-check out the runnable examples in
-[the official docs](https://pkg.go.dev/github.com/Nerdmaster/poker#section-documentation).
+The `HandResult` instance (`res` in the above example) can give you the raw
+score, hand rank, best five cards sorted in a human-readable manner, and can
+describe the hand in a human-friendly way, such as "Full House, Fours Over
+Twos".
 
 ## Performance
 
