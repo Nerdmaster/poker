@@ -106,18 +106,25 @@ BenchmarkSevenPoker-16           1000000             11050 ns/op            2304
 BenchmarkSevenJoker-16             20720            579313 ns/op          265405 B/op      10231 allocs/op
 ```
 
-My implementation absolutely crushes those other two:
+My implementation absolutely crushes the "Joker" approach, and handily beats
+chehsunliu's:
 
-- No memory is allocated on the heap in any cases
-- The seven-card case is over 7x faster
+- No memory is allocated on the heap in any cases. If you use a package to
+  implement a long-running poker game server, this can be critical.
+- The seven-card case is over 7x faster, simply because I pregenerate the list
+  of all possible five-card hands. It's only 21 items, man! Come on!
 - Even the five-card case, which I thought would be equivalent, is 2.5x faster
   than chehsunliu's, which I don't entirely understand given how similar our
-  approaches are
+  approaches are. Maybe that package uses an outdated lookup table...?
 
-I can't take much credit for this, though - most of the performance comes from
-porting C, C#, and even Java implementations I found all over the net which I
-can't properly give attribution to, because they're just a mish-mash of things
-posted on forums, stackoverflow, etc.
+## Caveat
+
+I'm amazing, and we all know this. But I have to be very clear here: **I can't
+take *any* credit for the five-card eval's speed**. The best I can claim is
+that I scoured the web to find the fastest implementation and then ported C,
+C#, and even Java implementations. Sadly, I can't properly offer attribution,
+because they're just a mish-mash of things posted on forums, stackoverflow,
+etc.
 
 ## Background
 
